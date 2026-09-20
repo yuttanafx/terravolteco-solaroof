@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Terravolteco — เปลี่ยนแดดให้เป็นไฟฟ้า</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    box-sizing: border-box;
+    --ink:#101B29;
+    --ink-soft:#41546A;
+    --paper:#EEF3F0;
+    --surface:#FFFFFF;
+    --line:#D9E2DC;
+    --sun:#F5A623;
+    --sun-deep:#E8590C;
+    --deep:#0F4C5C;
+    --deep-2:#123B49;
+    --eco:#2E8F7E;
+    --eco-soft:#E4F2EE;
+    --radius-s:4px;
+    --radius-m:10px;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --ink:#EEF3F0;
+      --ink-soft:#B7C4C0;
+      --paper:#0D1A17;
+      --surface:#122622;
+      --line:#24413B;
+      --eco-soft:#132E29;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#EEF3F0;
+    --ink-soft:#B7C4C0;
+    --paper:#0D1A17;
+    --surface:#122622;
+    --line:#24413B;
+    --eco-soft:#132E29;
+  }
+  html{ scroll-padding-top: 84px; scroll-behavior:smooth; }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans Thai", "Space Grotesk", system-ui, sans-serif;
+    font-weight:400;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  img{ max-width:100%; display:block; }
+  .num{ font-family:"Space Grotesk","IBM Plex Sans Thai",sans-serif; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+  a{ color:inherit; }
+  .overflow-x{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter:saturate(140%) blur(10px);
+    border-bottom:1px solid var(--line);
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px; max-width:1180px; margin:0 auto;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; font-family:"Space Grotesk"; font-weight:700; font-size:19px; letter-spacing:.2px; }
+  .brand .mark{ width:30px;height:30px; }
+  .navlinks{ display:flex; gap:30px; font-size:15px; color:var(--ink-soft); }
+  .navlinks a{ text-decoration:none; transition:color .15s; }
+  .navlinks a:hover{ color:var(--ink); }
+  .navcta{ display:flex; align-items:center; gap:16px; }
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:11px 22px; border-radius:999px; font-size:14.5px; font-weight:600;
+    text-decoration:none; border:1px solid transparent; cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    font-family:"IBM Plex Sans Thai";
+  }
+  .btn:active{ transform:scale(.97); }
+  .btn-sun{ background:var(--sun); color:#241300; }
+  .btn-sun:hover{ box-shadow:0 8px 22px -8px rgba(245,166,35,.65); }
+  .btn-outline{ border-color:var(--line); background:transparent; color:var(--ink); }
+  .btn-outline:hover{ border-color:var(--ink-soft); }
+  .menu-btn{ display:none; background:none; border:none; padding:8px; cursor:pointer; }
+  .menu-btn svg{ width:24px;height:24px; }
+
+  @media (max-width:880px){
+    .navlinks{ display:none; }
+    .menu-btn{ display:block; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:64px 0 40px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero .wrap{
+    display:grid; grid-template-columns: 1.05fr .95fr; gap:56px; align-items:center;
+  }
+  .kicker{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:13.5px; color:var(--eco); background:var(--eco-soft);
+    padding:6px 14px 6px 10px; border-radius:999px; margin-bottom:22px; font-weight:500;
+  }
+  .kicker svg{ width:14px; height:14px; }
+  h1{
+    font-family:"Space Grotesk","IBM Plex Sans Thai";
+    font-weight:600;
+    font-size:clamp(34px,4.6vw,54px);
+    line-height:1.14;
+    letter-spacing:-.5px;
+    margin:0 0 22px;
+  }
+  h1 .sun-word{ color:var(--sun-deep); }
+  .lede{ font-size:18px; color:var(--ink-soft); max-width:46ch; margin:0 0 32px; }
+  .hero-actions{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:44px; }
+  .hero-stats{ display:flex; gap:34px; flex-wrap:wrap; }
+  .stat b{ display:block; font-family:"Space Grotesk"; font-size:26px; font-weight:600; }
+  .stat span{ font-size:13.5px; color:var(--ink-soft); }
+
+  .hero-art{ position:relative; }
+  .hero-art svg{ width:100%; height:auto; }
+
+  /* ---------- Section shell ---------- */
+  section{ padding:88px 0; }
+  .section-head{ max-width:640px; margin-bottom:48px; }
+  .eyebrow-plain{ font-size:14px; color:var(--eco); font-weight:600; margin:0 0 10px; }
+  h2{
+    font-family:"Space Grotesk","IBM Plex Sans Thai";
+    font-weight:600; font-size:clamp(26px,3.2vw,36px); letter-spacing:-.3px; margin:0 0 14px;
+  }
+  .section-head p{ color:var(--ink-soft); font-size:16.5px; margin:0; }
+
+  /* ---------- Why grid ---------- */
+  .why-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius-m); overflow:hidden; }
+  .why-card{ background:var(--surface); padding:30px 26px; }
+  .why-card .ico{ width:38px;height:38px; margin-bottom:18px; color:var(--sun-deep); }
+  .why-card h3{ font-size:17px; font-weight:600; margin:0 0 8px; }
+  .why-card p{ font-size:14.5px; color:var(--ink-soft); margin:0; }
+  @media (max-width:900px){ .why-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:560px){ .why-grid{ grid-template-columns:1fr; } }
+
+  /* ---------- Tabs ---------- */
+  .tabs{ display:inline-flex; padding:4px; background:var(--surface); border:1px solid var(--line); border-radius:999px; margin-bottom:36px; }
+  .tab{ padding:10px 22px; border-radius:999px; font-size:14.5px; font-weight:600; cursor:pointer; color:var(--ink-soft); border:none; background:none; font-family:"IBM Plex Sans Thai"; }
+  .tab.active{ background:var(--deep); color:#fff; }
+
+  /* ---------- Calculator ---------- */
+  .calc-box{
+    display:grid; grid-template-columns:1fr 1fr; gap:0;
+    border:1px solid var(--line); border-radius:var(--radius-m); overflow:hidden;
+    background:var(--surface);
+  }
+  @media (max-width:900px){ .calc-box{ grid-template-columns:1fr; } }
+  .calc-inputs{ padding:34px 32px; border-right:1px solid var(--line); }
+  @media (max-width:900px){ .calc-inputs{ border-right:none; border-bottom:1px solid var(--line); } }
+  .field{ margin-bottom:22px; }
+  .field label{ display:block; font-size:13.5px; color:var(--ink-soft); margin-bottom:8px; font-weight:500; }
+  .field .row-inline{ display:flex; align-items:center; gap:10px; }
+  .field input[type="number"], .field select{
+    width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:var(--radius-s);
+    background:var(--paper); color:var(--ink); font-size:15px; font-family:"Space Grotesk","IBM Plex Sans Thai";
+  }
+  .field select{ font-family:"IBM Plex Sans Thai"; }
+  .field input[type="range"]{ width:100%; accent-color:var(--sun-deep); }
+  .field .hint{ font-size:12px; color:var(--ink-soft); margin-top:6px; }
+  .unit-toggle{ display:flex; border:1px solid var(--line); border-radius:999px; padding:3px; width:fit-content; margin-bottom:22px; }
+  .unit-toggle button{ border:none; background:none; padding:7px 16px; border-radius:999px; font-size:13px; font-weight:600; color:var(--ink-soft); cursor:pointer; font-family:"IBM Plex Sans Thai"; }
+  .unit-toggle button.active{ background:var(--deep); color:#fff; }
+
+  .calc-results{ padding:34px 32px; background:var(--eco-soft); display:flex; flex-direction:column; }
+  .result-hero{ margin-bottom:22px; }
+  .result-hero .big{ font-family:"Space Grotesk"; font-size:44px; font-weight:700; line-height:1; color:var(--deep); }
+  .result-hero .big span{ font-size:18px; font-weight:600; margin-left:4px; }
+  .result-hero p{ font-size:13.5px; color:var(--ink-soft); margin:8px 0 0; }
+  .result-table{ font-size:14px; margin-bottom:8px; }
+  .result-table .r-row{ display:flex; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--line); }
+  .result-table .r-row.total{ border-bottom:none; padding-top:16px; font-weight:600; }
+  .result-table .r-row.total .num{ font-size:20px; color:var(--deep); }
+  .result-table .r-row span:first-child{ color:var(--ink-soft); }
+  .result-table .r-row .num{ font-family:"Space Grotesk"; }
+  .calc-note{ font-size:12px; color:var(--ink-soft); margin-top:auto; padding-top:18px; }
+
+  /* ---------- Panel cards (spec-sheet style) ---------- */
+  .panel-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  @media (max-width:1040px){ .panel-grid{ grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .panel-grid{ grid-template-columns:1fr; } }
+  .panel-card{
+    border:1px solid var(--line); border-radius:var(--radius-m); background:var(--surface);
+    padding:24px 22px 20px; position:relative; display:flex; flex-direction:column;
+  }
+  .panel-card .watt{ font-family:"Space Grotesk"; font-size:40px; font-weight:700; line-height:1; }
+  .panel-card .watt sup{ font-size:16px; font-weight:600; margin-left:2px; }
+  .panel-card .model{ font-size:13px; color:var(--ink-soft); margin:6px 0 18px; font-family:"Space Grotesk"; }
+  .spec-table{ border-top:1px solid var(--line); font-size:13.5px; margin-bottom:18px; }
+  .spec-row{ display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line); color:var(--ink-soft); }
+  .spec-row b{ color:var(--ink); font-weight:500; font-family:"Space Grotesk"; }
+  .panel-card .price-row{ margin-top:auto; display:flex; align-items:baseline; justify-content:space-between; }
+  .price{ font-family:"Space Grotesk"; font-size:21px; font-weight:600; }
+  .price small{ font-size:12px; color:var(--ink-soft); font-weight:400; font-family:"IBM Plex Sans Thai"; }
+  .badge{ position:absolute; top:22px; right:22px; font-size:11.5px; background:var(--eco-soft); color:var(--eco); padding:4px 10px; border-radius:999px; font-weight:600; }
+
+  .panel-set{ display:none; }
+  .panel-set.active{ display:grid; }
+
+  /* ---------- Storage ---------- */
+  .storage-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:26px; }
+  @media (max-width:900px){ .storage-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:560px){ .storage-grid{ grid-template-columns:1fr; } }
+  .batt-card{ border:1px solid var(--line); border-radius:var(--radius-m); background:var(--surface); padding:24px 22px; }
+  .batt-card .brand-tag{ font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-bottom:10px; }
+  .batt-card .kwh{ font-family:"Space Grotesk"; font-size:32px; font-weight:700; }
+  .batt-card .kwh span{ font-size:15px; font-weight:500; }
+  .batt-card .model{ font-size:14px; color:var(--ink-soft); margin:4px 0 16px; }
+  .batt-meta{ display:flex; gap:16px; font-size:13px; color:var(--ink-soft); margin-bottom:16px; flex-wrap:wrap; }
+  .batt-meta span b{ color:var(--ink); font-family:"Space Grotesk"; }
+  .batt-card .price{ font-size:19px; }
+
+  .commercial-banner{
+    display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
+    background:var(--deep); color:#fff; border-radius:var(--radius-m); padding:30px 32px;
+  }
+  .commercial-banner h3{ font-family:"Space Grotesk"; font-size:20px; margin:0 0 6px; font-weight:600; }
+  .commercial-banner p{ margin:0; color:#CFE4E7; font-size:14.5px; max-width:56ch; }
+  .commercial-banner .cbtn{ background:#fff; color:var(--deep); }
+
+  /* ---------- Accessories ---------- */
+  .acc-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  @media (max-width:940px){ .acc-grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:560px){ .acc-grid{ grid-template-columns:1fr; } }
+  .acc-card{ border:1px solid var(--line); border-radius:var(--radius-m); padding:22px; background:var(--surface); }
+  .acc-card .ico{ width:26px;height:26px; color:var(--deep); margin-bottom:14px; }
+  .acc-card h4{ font-size:15px; margin:0 0 6px; font-weight:600; }
+  .acc-card p{ font-size:13px; color:var(--ink-soft); margin:0 0 12px; min-height:34px; }
+  .acc-card .from{ font-size:13px; color:var(--ink-soft); border-top:1px solid var(--line); padding-top:12px; }
+  .acc-card .from b{ font-family:"Space Grotesk"; color:var(--ink); font-size:15px; }
+
+  /* ---------- Process ---------- */
+  .process{ display:grid; grid-template-columns:repeat(4,1fr); gap:0; counter-reset:step; position:relative; }
+  @media (max-width:900px){ .process{ grid-template-columns:repeat(2,1fr); gap:28px; } }
+  @media (max-width:560px){ .process{ grid-template-columns:1fr; } }
+  .step{ padding:0 22px 0 0; position:relative; }
+  .step .idx{ font-family:"Space Grotesk"; font-size:14px; color:var(--sun-deep); font-weight:600; margin-bottom:14px; }
+  .step h4{ font-size:16.5px; margin:0 0 8px; font-weight:600; }
+  .step p{ font-size:14px; color:var(--ink-soft); margin:0; }
+  .step:not(:last-child)::after{
+    content:""; position:absolute; top:9px; right:0; width:calc(100% - 20px); height:1px; background:var(--line);
+  }
+  @media (max-width:900px){ .step:not(:last-child)::after{ display:none; } }
+
+  /* ---------- Price note table ---------- */
+  .note-table{ width:100%; border-collapse:collapse; font-size:14px; }
+  .note-table th{ text-align:left; font-weight:600; color:var(--ink-soft); font-size:12.5px; letter-spacing:.03em; padding:0 14px 12px 0; border-bottom:1px solid var(--line); }
+  .note-table td{ padding:14px 14px 14px 0; border-bottom:1px solid var(--line); }
+  .note-table tr:last-child td{ border-bottom:none; }
+
+  /* ---------- CTA banner ---------- */
+  .cta-band{
+    background:linear-gradient(120deg, var(--deep) 0%, var(--deep-2) 100%);
+    color:#fff; border-radius:20px; padding:56px 48px; display:flex; align-items:center; justify-content:space-between; gap:32px; flex-wrap:wrap;
+    position:relative; overflow:hidden;
+  }
+  .cta-band h2{ color:#fff; margin-bottom:10px; }
+  .cta-band p{ color:#CBE0E3; margin:0; max-width:48ch; }
+  .cta-band .actions{ display:flex; gap:14px; flex-wrap:wrap; }
+
+  /* ---------- Footer ---------- */
+  footer{ border-top:1px solid var(--line); padding:56px 0 40px; }
+  .foot-grid{ display:grid; grid-template-columns:1.3fr 1fr 1fr 1fr; gap:32px; margin-bottom:36px; }
+  @media (max-width:900px){ .foot-grid{ grid-template-columns:1fr 1fr; } }
+  @media (max-width:560px){ .foot-grid{ grid-template-columns:1fr; gap:28px; } }
+  footer h5{ font-size:14px; margin:0 0 14px; font-weight:600; }
+  footer ul{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+  footer a{ text-decoration:none; color:var(--ink-soft); font-size:14px; }
+  footer a:hover{ color:var(--ink); }
+  .foot-brand p{ color:var(--ink-soft); font-size:14px; max-width:36ch; margin:14px 0 0; }
+  .fine{ font-size:12.5px; color:var(--ink-soft); border-top:1px solid var(--line); padding-top:22px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+
+  .reveal-hidden{ opacity:0; transform:translateY(14px); }
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{ transition:opacity .6s ease, transform .6s ease; }
+  }
+
+  ::selection{ background:var(--sun); color:#241300; }
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--sun-deep); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="16" cy="16" r="15" stroke="#F5A623" stroke-width="2"/>
+        <path d="M16 6V9.5M16 22.5V26M6 16H9.5M22.5 16H26M9 9L11.3 11.3M20.7 20.7L23 23M23 9L20.7 11.3M11.3 20.7L9 23" stroke="#F5A623" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="5.5" fill="#F5A623"/>
+      </svg>
+      TERRAVOLTECO
+    </div>
+    <div class="navlinks">
+      <a href="#calculator">คำนวณระบบ</a>
+      <a href="#panels">แผงโซล่าเซลล์</a>
+      <a href="#storage">แบตเตอรี่กักเก็บพลังงาน</a>
+      <a href="#accessories">อุปกรณ์ระบบ</a>
+      <a href="#process">ขั้นตอนการติดตั้ง</a>
+      <a href="#contact">ติดต่อเรา</a>
+    </div>
+    <div class="navcta">
+      <a href="#contact" class="btn btn-sun">ขอใบเสนอราคา</a>
+      <button class="menu-btn" aria-label="เปิดเมนู" id="menuBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero" id="home" style="padding-top:56px;">
+    <div class="wrap">
+      <div>
+        <span class="kicker">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" stroke-linecap="round"/><circle cx="12" cy="12" r="4"/></svg>
+          ตัวแทนจำหน่าย JA Solar · Jinko Solar · Dyness · Pylontech
+        </span>
+        <h1>เปลี่ยนแดดบนหลังคา<br>ให้เป็น<span class="sun-word">ค่าไฟที่ลดลง</span>ทุกเดือน</h1>
+        <p class="lede">Terravolteco ออกแบบและติดตั้งระบบโซล่าเซลล์ครบวงจร ตั้งแต่แผงกำลังผลิตสูงสุด 720W ไปจนถึงระบบแบตเตอรี่กักเก็บพลังงาน พร้อมทีมช่างที่ดูแลตั้งแต่สำรวจหน้างานจนถึงบริการหลังการขาย</p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-sun">ขอใบเสนอราคาฟรี</a>
+          <a href="#panels" class="btn btn-outline">ดูแผงโซล่าเซลล์ทั้งหมด</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><b class="num">720W</b><span>กำลังผลิตสูงสุดต่อแผง</span></div>
+          <div class="stat"><b class="num">30 ปี</b><span>รับประกันการผลิตไฟฟ้า</span></div>
+          <div class="stat"><b class="num">16 kWh</b><span>แบตเตอรี่กักเก็บสูงสุดต่อลูก</span></div>
+          <div class="stat"><b class="num">100+</b><span>รายการอุปกรณ์ครบระบบ</span></div>
+        </div>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <svg viewBox="0 0 560 460" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#FCEBC8"/>
+              <stop offset="1" stop-color="#F3F7EF"/>
+            </linearGradient>
+            <linearGradient id="panelg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#123B49"/>
+              <stop offset="1" stop-color="#0F4C5C"/>
+            </linearGradient>
+            <linearGradient id="roofg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#1B2A3D"/>
+              <stop offset="1" stop-color="#101B29"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="560" height="460" rx="24" fill="url(#sky)"/>
+          <circle cx="430" cy="90" r="46" fill="#F5A623"/>
+          <g stroke="#F5A623" stroke-width="5" stroke-linecap="round">
+            <line x1="430" y1="8" x2="430" y2="26"/>
+            <line x1="430" y1="154" x2="430" y2="172"/>
+            <line x1="348" y1="90" x2="366" y2="90"/>
+            <line x1="494" y1="90" x2="512" y2="90"/>
+            <line x1="371" y1="31" x2="383" y2="43"/>
+            <line x1="477" y1="137" x2="489" y2="149"/>
+            <line x1="489" y1="31" x2="477" y2="43"/>
+            <line x1="383" y1="137" x2="371" y2="149"/>
+          </g>
+          <!-- house body -->
+          <rect x="90" y="300" width="300" height="140" fill="#F7F3E9" stroke="#101B29" stroke-width="2"/>
+          <rect x="140" y="350" width="46" height="90" fill="#0F4C5C"/>
+          <rect x="290" y="330" width="60" height="50" fill="#E9F1EE" stroke="#101B29" stroke-width="2"/>
+          <line x1="320" y1="330" x2="320" y2="380" stroke="#101B29" stroke-width="2"/>
+          <line x1="290" y1="355" x2="350" y2="355" stroke="#101B29" stroke-width="2"/>
+          <!-- roof -->
+          <polygon points="60,300 240,190 420,300" fill="url(#roofg)"/>
+          <!-- solar panel grid on roof -->
+          <g>
+            <polygon points="118,278 236,206 300,206 190,278" fill="url(#panelg)" stroke="#0A222B" stroke-width="1.5"/>
+            <g stroke="#2E5A66" stroke-width="1.2">
+              <line x1="142" y1="264" x2="260" y2="192"/>
+              <line x1="166" y1="250" x2="284" y2="178"/>
+              <line x1="150" y1="278" x2="230" y2="230"/>
+              <line x1="184" y1="278" x2="264" y2="230"/>
+              <line x1="218" y1="278" x2="298" y2="230"/>
+            </g>
+          </g>
+          <rect x="0" y="438" width="560" height="22" fill="#DDE6DF"/>
+          <ellipse cx="470" cy="330" rx="60" ry="16" fill="#ffffff" opacity=".5"/>
+          <ellipse cx="500" cy="345" rx="40" ry="12" fill="#ffffff" opacity=".4"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section id="why">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow-plain">ทำไมต้องติดโซล่าเซลล์กับ Terravolteco</p>
+        <h2>ระบบที่ออกแบบให้คุ้มค่าตั้งแต่วันแรกที่เปิดใช้งาน</h2>
+      </div>
+      <div class="why-grid">
+        <div class="why-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 3 14h7l-1 8 11-13h-7l1-7z" stroke-linejoin="round"/></svg>
+          <h3>ลดค่าไฟทันทีที่ใช้งาน</h3>
+          <p>ผลิตไฟฟ้าใช้เองในช่วงกลางวัน ลดยอดบิลค่าไฟได้ตั้งแต่เดือนแรกที่ระบบเริ่มทำงาน</p>
+        </div>
+        <div class="why-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M7 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
+          <h3>รับประกันแผงยาว 30 ปี</h3>
+          <p>แผง JA Solar และ Jinko Solar ทุกรุ่นให้การรับประกันผลิตไฟฟ้าเชิงเส้นสูงสุด 30 ปี</p>
+        </div>
+        <div class="why-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="10" y1="6" x2="14" y2="6"/><circle cx="12" cy="17" r="1.4" fill="currentColor" stroke="none"/></svg>
+          <h3>เก็บไฟไว้ใช้ตอนกลางคืน</h3>
+          <p>เสริมแบตเตอรี่ Dyness หรือ Pylontech เพื่อสำรองไฟไว้ใช้ต่อหลังพระอาทิตย์ตก</p>
+        </div>
+        <div class="why-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 7 9 18l-5-5"/></svg>
+          <h3>ครบวงจรจากผู้เชี่ยวชาญ</h3>
+          <p>สำรวจ ออกแบบ ติดตั้ง และดูแลหลังการขาย โดยทีมช่างของ Terravolteco ทุกขั้นตอน</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CALCULATOR -->
+  <section id="calculator" style="background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow-plain">คำนวณระบบเบื้องต้น</p>
+        <h2>ค่าไฟของคุณ ต้องใช้แผงกี่แผ่น งบวัสดุเท่าไร</h2>
+        <p>กรอกค่าไฟฟ้าเฉลี่ยต่อเดือน แล้วเลือกรุ่นแผงที่สนใจ ระบบจะประมาณจำนวนแผงและต้นทุนวัสดุให้ทันที ตัวเลขนี้เป็นการประมาณการเบื้องต้นเท่านั้น</p>
+      </div>
+
+      <div class="calc-box">
+        <div class="calc-inputs">
+          <div class="unit-toggle" id="unitToggle">
+            <button type="button" class="active" data-unit="bill">กรอกเป็นค่าไฟ (บาท)</button>
+            <button type="button" data-unit="kwh">กรอกเป็นหน่วยไฟฟ้า (kWh)</button>
+          </div>
+
+          <div class="field" id="billField">
+            <label for="billInput">ค่าไฟฟ้าเฉลี่ยต่อเดือน (บาท)</label>
+            <input type="number" id="billInput" value="3000" min="0" step="100">
+          </div>
+          <div class="field" id="kwhField" style="display:none;">
+            <label for="kwhInput">หน่วยไฟฟ้าที่ใช้เฉลี่ยต่อเดือน (kWh)</label>
+            <input type="number" id="kwhInput" value="680" min="0" step="10">
+          </div>
+
+          <div class="field">
+            <label for="rateInput">อัตราค่าไฟฟ้าเฉลี่ย (บาท/หน่วย)</label>
+            <input type="number" id="rateInput" value="4.4" min="1" step="0.1">
+            <p class="hint">ใช้แปลงค่าไฟเป็นหน่วยไฟฟ้า อ้างอิงอัตราเฉลี่ยครัวเรือนไทย ปรับได้ตามใบแจ้งหนี้จริง</p>
+          </div>
+
+          <div class="field">
+            <label for="sunInput">ชั่วโมงแดดเฉลี่ยต่อวัน (Peak Sun Hours): <b id="sunVal">4.5</b> ชม.</label>
+            <input type="range" id="sunInput" min="3" max="5.5" step="0.1" value="4.5">
+          </div>
+
+          <div class="field">
+            <label for="offsetInput">สัดส่วนไฟที่ต้องการผลิตชดเชย: <b id="offsetVal">80%</b></label>
+            <input type="range" id="offsetInput" min="30" max="100" step="5" value="80">
+          </div>
+
+          <div class="field">
+            <label for="panelSelect">เลือกรุ่นแผงโซล่าเซลล์</label>
+            <select id="panelSelect">
+              <option value="0">JA Solar 630W — ฿2,790.50/แผง</option>
+              <option value="1">JA Solar 640W — ฿2,834.79/แผง</option>
+              <option value="2">JA Solar 650W — ฿2,911.44/แผง</option>
+              <option value="3" selected>JA Solar 720W — ฿3,189.14/แผง</option>
+              <option value="4">Jinko Solar 630W — ฿2,853.21/แผง</option>
+              <option value="5">Jinko Solar 650W — ฿3,008.48/แผง</option>
+              <option value="6">Jinko Solar 725W — ฿3,283.45/แผง</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="calc-results">
+          <div class="result-hero">
+            <div class="big" id="resPanels">10 <span>แผ่น</span></div>
+            <p>จำนวนแผงที่แนะนำ จากขนาดระบบที่คำนวณได้</p>
+          </div>
+          <div class="result-table">
+            <div class="r-row"><span>ปริมาณไฟฟ้าที่ใช้โดยประมาณ</span><span class="num" id="resKwh">–</span></div>
+            <div class="r-row"><span>ขนาดระบบที่แนะนำ</span><span class="num" id="resKwp">–</span></div>
+            <div class="r-row"><span>กำลังผลิตจริงของระบบ</span><span class="num" id="resActualKwp">–</span></div>
+            <div class="r-row"><span>ราคาแผงโซล่ารวม</span><span class="num" id="resPanelCost">–</span></div>
+            <div class="r-row"><span>ประมาณการอุปกรณ์ประกอบระบบ*</span><span class="num" id="resBos">–</span></div>
+            <div class="r-row total"><span>รวมประมาณการต้นทุนวัสดุ</span><span class="num" id="resTotal">–</span></div>
+          </div>
+          <a href="#contact" class="btn btn-sun" style="align-self:flex-start; margin-top:6px;">ขอใบเสนอราคาที่แม่นยำ</a>
+          <p class="calc-note">*ประมาณการค่าอุปกรณ์ยึดแผง สายไฟ ตัวเชื่อมต่อ และอุปกรณ์ป้องกันไฟฟ้า ที่ราว 30% ของราคาแผง อ้างอิงจากรายการอุปกรณ์จริงของ Terravolteco ตัวเลขทั้งหมดยังไม่รวมอินเวอร์เตอร์ ค่าแรงติดตั้ง และ VAT 7% กรุณาติดต่อทีมขายเพื่อใบเสนอราคาที่แม่นยำตามหน้างานจริง</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANELS -->
+  <section id="panels">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow-plain">แผงโซล่าเซลล์</p>
+        <h2>แผงกำลังผลิตสูง ประสิทธิภาพสูงสุด 23.3%</h2>
+        <p>ทุกรุ่นเป็นเทคโนโลยี n-type bifacial กระจกสองด้าน รับแสงสะท้อนเพิ่มกำลังผลิตได้อีก 10%</p>
+      </div>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="ja">JA Solar</button>
+        <button class="tab" data-tab="jinko">Jinko Solar</button>
+      </div>
+
+      <div class="panel-grid panel-set active" data-set="ja">
+        <div class="panel-card">
+          <div class="watt">630<sup>W</sup></div>
+          <div class="model">JAM66D45-630/LB</div>
+          <div class="spec-table">
+            <div class="spec-row"><span>ประสิทธิภาพเซลล์</span><b>23.3%</b></div>
+            <div class="spec-row"><span>แรงดันวงจรเปิด (Voc)</span><b>48.90V</b></div>
+            <div class="spec-row"><span>เทคโนโลยีเซลล์</span><b>n-Bycium+ 16BB</b></div>
+            <div class="spec-row"><span>การรับประกัน</span><b>12 / 30 ปี</b></div>
+          </div>
+          <div class="price-row"><div class="price">฿2,790.50<br><small>ไม่รวม VAT / แผง</small></div></div>
+        </div>
+        <div class="panel-card">
+          <div class="watt">640<sup>W</sup></div>
+          <div class="model">JAM72D42 640W LB</div>
+          <div class="spec-table">
+            <div class="spec-row"><span>ประเภทเซลล์</span><b>Mono n-type</b></div>
+            <div class="spec-row"><span>โครงสร้าง</span><b>Bifacial Double Glass</b></div>
+            <div class="spec-row"><span>เทคโนโลยีเซลล์</span><b>n-Bycium+</b></div>
+            <div class="spec-row"><span>การรับประกัน</span><b>12 / 30 ปี</b></div>
+          </div>
+          <div class="price-row"><div class="price">฿2,834.79<br><small>ไม่รวม VAT / แผง</small></div></div>
+        </div>
+        <div class="panel-card">
+          <div class="watt">650<sup>W</sup></div>
+          <div class="model">JAM72D42-650/LB</div>
+          <div class="spec-table">
+            <div class="spec-row"><span>ประเภทเซลล์</span><b>Mono n-type</b></div>
+            <div class="spec-row"><span>โครงสร้าง</span><b>Bifacial Double Glass</b></div>
+            <div class="spec-row"><span>เทคโนโลยีเซลล์</span><b>n-Bycium+</b></div>
+            <div class="spec-row"><span>การรับประกัน</span><b>12 / 30 ปี</b></div>
+          </div>
+          <div class="price-row"><div class="price">฿2,911.44<br><small>ไม่รวม VAT / แผง</small></div></div>
+        </div>
+        <div class="panel-card">
+          <span class="badge">ตัวท็อป</span>
+          <div class="watt">720<sup>W</sup></div>
+          <div class="model">JAM66D46 720W LB</div>
+          <div class="spec-table">
+            <div class="spec-row"><span>ประสิทธิภาพเซลล์</span><b>23.2%</b></div>
+            <div class="spec-row"><span>แรงดันวงจรเปิด (Voc)</span><b>49.00V</b></div>
+            <div class="spec-row"><span>เทคโนโลยีเซลล์</span><b>n-Bycium+ 18BB</b></div>
+            <div class="spec-row"><span>การรับประกัน</span><b>12 / 30 ปี</b></div>
+          </div>
+          <div class="price-row"><div class="price">฿3,189.14<br><small>ไม่รวม VAT / แผง</small></div></div>
+        </div>
+      </div>
+
+      <div class="panel-grid panel-set" data-set="jinko">
+        <div class="panel-card">
+          <div class="watt">630<sup>W</sup></div>
+          <div class="model">JKM630N-66HL4M-BDV</div>
+          <div class="spec-table">
+            <div class="spec-row"><span>ประเภทเซลล์</span><b>N-type Mono</b></div>
+            <div class="spec-row"><span>โครงสร้าง</span><b>Bifacial Double Glass</b></div>
+            <div class="spec-row"><span>รุ่น</span><b>Tiger Neo</b></div>
+            <div class="spec-row"><span>การรับประกัน</span><b>12 / 30 ปี</b></div>
+          </div>
+          <div class="price-row"><div class="price">฿2,853.21<br><small>ไม่รวม VAT / แผง</small></div></div>
+        </div>
+        <div class="panel-card">
+          <span class="badge">Tiger Neo III</span>
+          <div class="watt">650<sup>W</sup></div>
+          <div class="model">JKM650N-66QL6-BDV</div>
+          <div class="spec-table">
+            <div class="spec-row"><span>ประเภทเซลล์</span><b>N-type Mono</b></div>
+            <div class="spec-row"><span>โครงสร้าง</span><b>Bifacial Double Glass</b></div>
+            <div class="spec-row"><span>รุ่น</span><b>Tiger Neo III</b></div>
+            <div class="spec-row"><span>การรับประกัน</span><b>12 / 30 ปี</b></div>
+          </div>
+          <div class="price-row"><div class="price">฿3,008.48<br><small>ไม่รวม VAT / แผง</small></div></div>
+        </div>
+        <div class="panel-card">
+          <span class="badge">ตัวท็อป</span>
+          <div class="watt">725<sup>W</sup></div>
+          <div class="model">JKM725N-66HL5-BDV</div>
+          <div class="spec-table">
+            <div class="spec-row"><span>ประเภทเซลล์</span><b>N-type Mono</b></div>
+            <div class="spec-row"><span>โครงสร้าง</span><b>Bifacial Double Glass</b></div>
+            <div class="spec-row"><span>รุ่น</span><b>Tiger Neo</b></div>
+            <div class="spec-row"><span>การรับประกัน</span><b>12 / 30 ปี</b></div>
+          </div>
+          <div class="price-row"><div class="price">฿3,283.45<br><small>ไม่รวม VAT / แผง</small></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORAGE -->
+  <section id="storage" style="background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow-plain">แบตเตอรี่กักเก็บพลังงาน</p>
+        <h2>เก็บไฟส่วนเกินไว้ใช้ต่อในช่วงกลางคืน</h2>
+        <p>เลือกได้ทั้งแบตเตอรี่ลิเธียมจาก Dyness และ Pylontech รองรับการต่อขยายตามขนาดการใช้ไฟของบ้านหรือธุรกิจ</p>
+      </div>
+
+      <div class="storage-grid">
+        <div class="batt-card">
+          <div class="brand-tag">Dyness</div>
+          <div class="kwh">5.12<span>kWh</span></div>
+          <div class="model">DL5.0F · 51.2V 100AH</div>
+          <div class="batt-meta"><span>รับประกัน <b>7 ปี</b></span><span>IP65</span></div>
+          <div class="price">฿30,358.57</div>
+        </div>
+        <div class="batt-card">
+          <div class="brand-tag">Dyness</div>
+          <div class="kwh">16<span>kWh</span></div>
+          <div class="model">Powerbrick Plus · IP65 พร้อมล้อเลื่อน</div>
+          <div class="batt-meta"><span>รับประกัน <b>10 ปี</b></span><span>IP65</span></div>
+          <div class="price">฿75,647.58</div>
+        </div>
+        <div class="batt-card">
+          <div class="brand-tag">Dyness</div>
+          <div class="kwh">5<span>kWh</span></div>
+          <div class="model">Stack100 Pro S51100 Pro · แรงดันสูง</div>
+          <div class="batt-meta"><span>รับประกัน <b>10 ปี</b></span><span>IP65</span></div>
+          <div class="price">฿49,728.33</div>
+        </div>
+        <div class="batt-card">
+          <div class="brand-tag">Pylontech</div>
+          <div class="kwh">5.12<span>kWh</span></div>
+          <div class="model">Fidus FB-L-5.12 · แขวนผนังหรือมีล้อเลื่อน</div>
+          <div class="batt-meta"><span>รับประกัน <b>10 ปี</b></span><span>IP65</span></div>
+          <div class="price">฿26,874.80</div>
+        </div>
+        <div class="batt-card">
+          <div class="brand-tag">Pylontech</div>
+          <div class="kwh">16<span>kWh</span></div>
+          <div class="model">Fidus Plus FB-L-16 · แขวนผนังหรือมีล้อเลื่อน</div>
+          <div class="batt-meta"><span>รับประกัน <b>10 ปี</b></span><span>IP65</span></div>
+          <div class="price">฿63,703.23</div>
+        </div>
+        <div class="batt-card">
+          <div class="brand-tag">Pylontech</div>
+          <div class="kwh">16<span>kWh</span></div>
+          <div class="model">Fidus Plus FB-L-16 · รุ่นป้องกันอัคคีภัย</div>
+          <div class="batt-meta"><span>รับประกัน <b>10 ปี</b></span><span>IP65</span></div>
+          <div class="price">฿65,693.95</div>
+        </div>
+      </div>
+
+      <div class="commercial-banner">
+        <div>
+          <h3>ระบบกักเก็บพลังงานระดับโรงงาน — Solis EverCore</h3>
+          <p>สำหรับธุรกิจและโรงงานที่ต้องการกักเก็บพลังงานตั้งแต่ 100kWh ถึง 261kWh พร้อมกำลังไฟสูงสุด 125kW เริ่มต้นที่ ฿957,439.61</p>
+        </div>
+        <a href="#contact" class="btn cbtn">ปรึกษาโครงการ</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCESSORIES -->
+  <section id="accessories">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow-plain">อุปกรณ์ระบบและ Balance of System</p>
+        <h2>อุปกรณ์ครบระบบกว่า 100 รายการ</h2>
+        <p>ตั้งแต่สายไฟ ระบบยึดแผง ไปจนถึงอุปกรณ์ป้องกันไฟฟ้า พร้อมส่งพร้อมติดตั้งจากคลังของเราเอง</p>
+      </div>
+      <div class="acc-grid">
+        <div class="acc-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12c4 0 4-6 8-6s4 6 8 6-4 6-8 6-4-6-8-6z"/></svg>
+          <h4>สายไฟและตัวเชื่อมต่อ PV</h4>
+          <p>สาย PV1-F, สายกราวด์, หัวต่อ MC4 ครบทุกขนาด</p>
+          <div class="from">เริ่มต้น <b>฿24.88</b></div>
+        </div>
+        <div class="acc-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="10" width="18" height="4"/><path d="M6 10V6h12v4"/></svg>
+          <h4>ระบบยึดแผง Joca Mounting</h4>
+          <p>รางอลูมิเนียม แคลมป์ และ L-feet สำหรับหลังคาทุกประเภท</p>
+          <div class="from">เริ่มต้น <b>฿5.97</b></div>
+        </div>
+        <div class="acc-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 3 14h7l-1 8 11-13h-7l1-7z"/></svg>
+          <h4>เบรกเกอร์และอุปกรณ์ป้องกันไฟกระชาก</h4>
+          <p>DC/AC MCB, MCCB, SPD จาก SUNTREE ตามมาตรฐาน</p>
+          <div class="from">เริ่มต้น <b>฿99.54</b></div>
+        </div>
+        <div class="acc-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20h8M12 16v4"/></svg>
+          <h4>มิเตอร์และระบบมอนิเตอร์</h4>
+          <p>สมาร์ทมิเตอร์ WiFi/4G Logger สำหรับดูข้อมูลการผลิตไฟแบบเรียลไทม์</p>
+          <div class="from">เริ่มต้น <b>฿447.91</b></div>
+        </div>
+        <div class="acc-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16"/></svg>
+          <h4>ตู้รวมสาย Combiner Box</h4>
+          <p>SUNTREE Distribution Box ตั้งแต่ 9 ถึง 24 ช่อง IP65</p>
+          <div class="from">เริ่มต้น <b>฿278.70</b></div>
+        </div>
+        <div class="acc-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg>
+          <h4>ระบบ Rapid Shutdown</h4>
+          <p>Projoy ตัดไฟระดับแผงเพื่อความปลอดภัยของทีมช่างและอาคาร</p>
+          <div class="from">เริ่มต้น <b>฿94.56</b></div>
+        </div>
+        <div class="acc-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          <h4>รางเดินสาย Cable Trunking</h4>
+          <p>รางสายพีวีซีและข้อต่อครบชุดสำหรับงานเดินสายเรียบร้อย</p>
+          <div class="from">เริ่มต้น <b>฿49.77</b></div>
+        </div>
+        <div class="acc-card">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4v16h16M8 16l4-5 3 3 4-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h4>ระบบสลับแหล่งจ่ายอัตโนมัติ ATS</h4>
+          <p>สวิตช์สลับไฟฟ้าอัตโนมัติเมื่อไฟฟ้าดับหรือระบบขัดข้อง</p>
+          <div class="from">เริ่มต้น <b>฿1,132.23</b></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process" style="background:var(--surface); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow-plain">ขั้นตอนการติดตั้ง</p>
+        <h2>จากสำรวจหน้างานถึงเปิดใช้งานจริง ใน 4 ขั้นตอน</h2>
+      </div>
+      <div class="process">
+        <div class="step">
+          <div class="idx">01</div>
+          <h4>สำรวจหน้างาน</h4>
+          <p>ทีมช่างลงพื้นที่ตรวจโครงสร้างหลังคาและวัดปริมาณการใช้ไฟจริง</p>
+        </div>
+        <div class="step">
+          <div class="idx">02</div>
+          <h4>ออกแบบและเสนอราคา</h4>
+          <p>เลือกขนาดระบบ แผง และแบตเตอรี่ให้เหมาะกับงบประมาณและการใช้งาน</p>
+        </div>
+        <div class="step">
+          <div class="idx">03</div>
+          <h4>ติดตั้งโดยทีมช่างมืออาชีพ</h4>
+          <p>ติดตั้งตามมาตรฐานความปลอดภัย พร้อมทดสอบระบบก่อนส่งมอบ</p>
+        </div>
+        <div class="step">
+          <div class="idx">04</div>
+          <h4>บริการหลังการขาย</h4>
+          <p>ดูแลตามระยะรับประกัน และให้คำปรึกษาการใช้งานระบบต่อเนื่อง</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta">
+    <div class="wrap">
+      <div class="cta-band">
+        <div>
+          <h2>พร้อมให้หลังคาบ้านคุณเริ่มผลิตไฟฟ้าหรือยัง</h2>
+          <p>ทีมงาน Terravolteco พร้อมให้คำปรึกษาและประเมินราคาฟรี ไม่มีค่าใช้จ่ายในการสำรวจหน้างาน</p>
+        </div>
+        <div class="actions">
+          <a href="#contact" class="btn btn-sun">ขอใบเสนอราคาฟรี</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICE NOTE -->
+  <section id="pricing-note">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow-plain">หมายเหตุเรื่องราคา</p>
+        <h2>ราคาอ้างอิงสำหรับลูกค้าทั่วไป</h2>
+        <p>ราคาที่แสดงเป็นราคาลูกค้าใหม่ ยังไม่รวมภาษีมูลค่าเพิ่ม 7% และอาจเปลี่ยนแปลงได้ตามใบราคาล่าสุด กรุณาติดต่อทีมขายเพื่อยืนยันราคาก่อนสั่งซื้อ</p>
+      </div>
+      <div class="overflow-x">
+        <table class="note-table">
+          <tr><th>รายการ</th><th>ราคาเริ่มต้น (ไม่รวม VAT)</th><th>การรับประกัน</th></tr>
+          <tr><td>แผงโซล่าเซลล์ JA Solar</td><td class="num">฿2,790.50</td><td>12 / 30 ปี</td></tr>
+          <tr><td>แผงโซล่าเซลล์ Jinko Solar</td><td class="num">฿2,853.21</td><td>12 / 30 ปี</td></tr>
+          <tr><td>แบตเตอรี่ Pylontech Fidus 5.12kWh</td><td class="num">฿26,874.80</td><td>10 ปี</td></tr>
+          <tr><td>แบตเตอรี่ Dyness DL5.0F 5.12kWh</td><td class="num">฿30,358.57</td><td>7 ปี</td></tr>
+          <tr><td>ระบบกักเก็บพลังงาน Solis EverCore</td><td class="num">฿957,439.61</td><td>5 ปี</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- CONTACT / FOOTER -->
+<footer id="contact">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="brand">
+          <svg class="mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="15" stroke="#F5A623" stroke-width="2"/>
+            <circle cx="16" cy="16" r="5.5" fill="#F5A623"/>
+          </svg>
+          TERRAVOLTECO
+        </div>
+        <p>บริษัท เทอร์ร่าโวลท์อีโค จำกัด ผู้จำหน่ายและติดตั้งระบบโซล่าเซลล์ครบวงจร สำหรับบ้าน ธุรกิจ และโรงงาน</p>
+        <p style="margin-top:14px;">เลขทะเบียนนิติบุคคล: 0105568219507</p>
+      </div>
+      <div>
+        <h5>ติดต่อทีมขาย</h5>
+        <ul>
+          <li><a href="tel:0000000000">โทร: 0-000-0000</a></li>
+          <li><a href="mailto:sales@terravolteco.co.th">sales@terravolteco.co.th</a></li>
+          <li><a href="#">แชทผ่าน LINE Official</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>ที่ตั้งบริษัท</h5>
+        <ul>
+          <li><a href="https://www.google.co.th/maps/search/38%2F13+%E0%B8%AB%E0%B8%A1%E0%B8%B9%E0%B9%88%E0%B8%97%E0%B8%B5%E0%B9%88+2+%E0%B8%AB%E0%B8%99%E0%B9%89%E0%B8%B2%E0%B9%84%E0%B8%A1%E0%B9%89+%E0%B8%A5%E0%B8%B2%E0%B8%94%E0%B8%AB%E0%B8%A5%E0%B8%B8%E0%B8%A1%E0%B9%81%E0%B8%81%E0%B9%89%E0%B8%A7+%E0%B8%9B%E0%B8%97%E0%B8%B8%E0%B8%A1%E0%B8%98%E0%B8%B2%E0%B8%99%E0%B8%B5" target="_blank" rel="noopener">38/13 หมู่ที่ 2 ตำบลหน้าไม้<br>อำเภอลาดหลุมแก้ว จ.ปทุมธานี 12140</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>สินค้าและบริการ</h5>
+        <ul>
+          <li><a href="#panels">แผงโซล่าเซลล์</a></li>
+          <li><a href="#storage">แบตเตอรี่กักเก็บพลังงาน</a></li>
+          <li><a href="#accessories">อุปกรณ์ระบบ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fine">
+      <span>© 2026 บริษัท เทอร์ร่าโวลท์อีโค จำกัด</span>
+      <span>ราคาทั้งหมดยังไม่รวม VAT 7% และอาจเปลี่ยนแปลงโดยไม่แจ้งล่วงหน้า</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Tabs
+  document.querySelectorAll('.tab').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.panel-set').forEach(function(s){ s.classList.remove('active'); });
+      btn.classList.add('active');
+      var set = document.querySelector('.panel-set[data-set="'+btn.dataset.tab+'"]');
+      if(set) set.classList.add('active');
+    });
+  });
+
+  // Mobile menu -> simple scroll to nav links list toggle (fallback: just jump using existing anchor hrefs)
+  document.getElementById('menuBtn').addEventListener('click', function(){
+    var links = document.querySelector('.navlinks');
+    var visible = links.style.display === 'flex';
+    links.style.display = visible ? 'none' : 'flex';
+    links.style.position = 'absolute';
+    links.style.top = '64px';
+    links.style.left = '0';
+    links.style.right = '0';
+    links.style.background = 'var(--surface)';
+    links.style.flexDirection = 'column';
+    links.style.padding = '20px 28px';
+    links.style.borderBottom = '1px solid var(--line)';
+    links.style.gap = '18px';
+  });
+
+  // ---------- Solar calculator ----------
+  (function(){
+    var panels = [
+      { name:'JA Solar 630W',  watt:630, price:2790.50 },
+      { name:'JA Solar 640W',  watt:640, price:2834.79 },
+      { name:'JA Solar 650W',  watt:650, price:2911.44 },
+      { name:'JA Solar 720W',  watt:720, price:3189.14 },
+      { name:'Jinko Solar 630W', watt:630, price:2853.21 },
+      { name:'Jinko Solar 650W', watt:650, price:3008.48 },
+      { name:'Jinko Solar 725W', watt:725, price:3283.45 }
+    ];
+    var BOS_RATIO = 0.30; // ประมาณการอุปกรณ์ประกอบ ~30% ของราคาแผง (อ้างอิงราง/แคลมป์/L-feet/MC4/เบรกเกอร์จากรายการจริง)
+    var PERFORMANCE_RATIO = 0.8; // ค่าความสูญเสียของระบบโดยรวม (สาย, อินเวอร์เตอร์, อุณหภูมิ ฯลฯ)
+
+    var billInput = document.getElementById('billInput');
+    var kwhInput = document.getElementById('kwhInput');
+    var billField = document.getElementById('billField');
+    var kwhField = document.getElementById('kwhField');
+    var rateInput = document.getElementById('rateInput');
+    var sunInput = document.getElementById('sunInput');
+    var offsetInput = document.getElementById('offsetInput');
+    var panelSelect = document.getElementById('panelSelect');
+    var unitToggle = document.getElementById('unitToggle');
+    var currentUnit = 'bill';
+
+    function thb(n){
+      return '฿' + n.toLocaleString('th-TH', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+    }
+
+    function calc(){
+      var rate = parseFloat(rateInput.value) || 4.4;
+      var monthlyKwh;
+      if(currentUnit === 'bill'){
+        var bill = parseFloat(billInput.value) || 0;
+        monthlyKwh = bill / rate;
+      } else {
+        monthlyKwh = parseFloat(kwhInput.value) || 0;
+      }
+      var sunHours = parseFloat(sunInput.value);
+      var offset = parseFloat(offsetInput.value) / 100;
+      document.getElementById('sunVal').textContent = sunHours.toFixed(1);
+      document.getElementById('offsetVal').textContent = Math.round(offset*100) + '%';
+
+      var dailyKwh = (monthlyKwh / 30) * offset;
+      var systemKwp = dailyKwh / (sunHours * PERFORMANCE_RATIO);
+
+      var panel = panels[parseInt(panelSelect.value, 10)];
+      var panelCount = Math.max(1, Math.ceil((systemKwp * 1000) / panel.watt));
+      var actualKwp = (panelCount * panel.watt) / 1000;
+      var panelCost = panelCount * panel.price;
+      var bosCost = panelCost * BOS_RATIO;
+      var totalCost = panelCost + bosCost;
+
+      document.getElementById('resPanels').innerHTML = panelCount + ' <span>แผ่น</span>';
+      document.getElementById('resKwh').textContent = Math.round(monthlyKwh).toLocaleString('th-TH') + ' หน่วย/เดือน';
+      document.getElementById('resKwp').textContent = systemKwp.toFixed(2) + ' kWp';
+      document.getElementById('resActualKwp').textContent = actualKwp.toFixed(2) + ' kWp';
+      document.getElementById('resPanelCost').textContent = thb(panelCost);
+      document.getElementById('resBos').textContent = thb(bosCost);
+      document.getElementById('resTotal').textContent = thb(totalCost);
+    }
+
+    unitToggle.querySelectorAll('button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        unitToggle.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        currentUnit = btn.dataset.unit;
+        billField.style.display = currentUnit === 'bill' ? 'block' : 'none';
+        kwhField.style.display = currentUnit === 'kwh' ? 'block' : 'none';
+        calc();
+      });
+    });
+
+    [billInput, kwhInput, rateInput, sunInput, offsetInput, panelSelect].forEach(function(el){
+      el.addEventListener('input', calc);
+      el.addEventListener('change', calc);
+    });
+
+    calc();
+  })();
+
+  // Reveal on scroll (single orchestrated moment per section)
+  var targets = document.querySelectorAll('section .section-head, .hero-art, .cta-band, .commercial-banner');
+  targets.forEach(function(el){ el.classList.add('reveal','reveal-hidden'); });
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.remove('reveal-hidden');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    targets.forEach(function(el){ io.observe(el); });
+  } else {
+    targets.forEach(function(el){ el.classList.remove('reveal-hidden'); });
+  }
+</script>
+
+</body>
+</html>
